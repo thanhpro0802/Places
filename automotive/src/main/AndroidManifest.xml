@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="androidx.car.app.MAP_TEMPLATES" />
 
     <uses-feature
         android:name="android.hardware.type.automotive"
@@ -12,13 +13,16 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Places">
 
         <meta-data
             android:name="com.android.automotive"
             android:resource="@xml/automotive_app_desc" />
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="1" />
 
         <activity
             android:name="androidx.car.app.activity.CarAppActivity"
@@ -35,6 +39,15 @@
                 android:name="distractionOptimized"
                 android:value="true" />
         </activity>
+
+        <service
+            android:name="com.example.places.carappservice.PlacesCarAppService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.POI" />
+            </intent-filter>
+        </service>
 
     </application>
 </manifest>

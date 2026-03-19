@@ -1,9 +1,12 @@
+package com.example.places.carappservice
+
 import androidx.car.app.CarAppService
 import androidx.car.app.Session
 import androidx.car.app.SessionInfo
 import androidx.car.app.validation.HostValidator
 import android.content.Intent
 import androidx.car.app.Screen
+import com.example.places.carappservice.screen.MainScreen
 
 
 class PlacesCarAppService : CarAppService() {
