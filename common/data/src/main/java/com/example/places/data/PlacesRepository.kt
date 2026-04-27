@@ -18,12 +18,12 @@ interface OverpassService {
     suspend fun getNearby(@Field("data") query: String): OverpassResponse
 }
 
-class PlacesRepository {
+// Singleton cache — tránh mất dữ liệu khi tạo PlacesRepository() mới
+object PlacesCache {
+    var places: List<Place> = emptyList()
+}
 
-    // 2. KHÔI PHỤC BIẾN LƯU TRỮ BỊ THIẾU
-    companion object {
-        var cachedPlaces: List<Place> = emptyList()
-    }
+class PlacesRepository {
 
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -44,6 +44,9 @@ class PlacesRepository {
               node(around:1500,$lat,$lng)[amenity=restaurant];
               node(around:1500,$lat,$lng)[amenity=fuel];
               node(around:1500,$lat,$lng)[amenity=cafe];
+              node(around:1500,$lat,$lng)[amenity=hospital];
+              node(around:1500,$lat,$lng)[amenity=atm];
+              node(around:1500,$lat,$lng)[shop=supermarket];
             );
             out;
         """.trimIndent()
@@ -59,7 +62,8 @@ class PlacesRepository {
                         // Xử lý mã ID bằng hashCode() để tránh lỗi tràn số âm
                         id = element.id.hashCode(),
                         name = element.tags?.name ?: "",
-                        description = "Loại: ${element.tags?.amenity ?: "N/A"}",
+                        // Ưu tiên amenity, nếu không có dùng shop tag
+                        description = "Loại: ${element.tags?.amenity ?: element.tags?.shop ?: "N/A"}",
                         latitude = element.lat,
                         longitude = element.lon
                     )
@@ -67,8 +71,8 @@ class PlacesRepository {
 
             Log.d("OSM", "Sau khi lọc: ${realPlaces.size}")
 
-            // Lưu vào biến tĩnh
-            cachedPlaces = realPlaces
+            // Lưu vào PlacesCache singleton
+            PlacesCache.places = realPlaces
             realPlaces
 
         } catch (e: Exception) {
@@ -85,12 +89,12 @@ class PlacesRepository {
             Place(1, "Hồ Hoàn Kiếm", "Dữ liệu mẫu", 21.028511, 105.852319),
             Place(2, "Tòa nhà FPT Tower", "Dữ liệu mẫu", 21.027600, 105.792300)
         )
-        cachedPlaces = dummyList
+        PlacesCache.places = dummyList
         return dummyList
     }
 
     // 4. KHÔI PHỤC HÀM TÌM KIẾM CHO DETAIL SCREEN
     fun getPlace(placeId: Int): Place? {
-        return cachedPlaces.find { it.id == placeId }
+        return PlacesCache.places.find { it.id == placeId }
     }
 }

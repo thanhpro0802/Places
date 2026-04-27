@@ -12,6 +12,7 @@ import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 import androidx.core.graphics.drawable.IconCompat
 import com.example.places.carappservice.R
+import com.example.places.data.PlacesCache
 import com.example.places.data.PlacesRepository
 import com.example.places.data.model.toIntent
 
@@ -19,7 +20,7 @@ class DetailScreen(carContext: CarContext, private val placeId: Int) : Screen(ca
     private var isBookmarked = false
 
     override fun onGetTemplate(): Template {
-        val place = PlacesRepository().getPlace(placeId)
+        val place = PlacesCache.places.find { it.id == placeId }
             ?: return MessageTemplate.Builder("Place not found")
                 .setHeader(
                     Header.Builder()
