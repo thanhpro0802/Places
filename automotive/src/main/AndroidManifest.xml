@@ -37,7 +37,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep link: mở app từ browser hoặc intent geo: -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -47,6 +46,10 @@
             <meta-data
                 android:name="distractionOptimized"
                 android:value="true" />
+
+            <meta-data
+                android:name="androidx.car.app.CAR_APP_ACTIVITY"
+                android:value="com.example.places.carappservice.PlacesCarAppService" />
         </activity>
 
         <service

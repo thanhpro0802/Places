@@ -9,6 +9,7 @@ import androidx.car.app.connection.CarConnection
 import androidx.car.app.validation.HostValidator
 import androidx.car.app.CarToast
 import androidx.car.app.Screen
+import androidx.car.app.ScreenManager // Đã thêm import này
 import com.example.places.carappservice.screen.MainScreen
 
 
@@ -34,6 +35,8 @@ class PlacesSession : Session() {
         Log.d("PlacesSession", "onNewIntent: ${intent.data}")
         // Nếu nhận geo: intent, quay về MainScreen (xóa back stack)
         if (intent.data?.scheme == "geo") {
+            // Đã sửa lỗi: Lấy ScreenManager từ carContext
+            val screenManager = carContext.getCarService(ScreenManager::class.java)
             screenManager.popToRoot()
         }
     }

@@ -3,8 +3,8 @@ package com.example.places.carappservice.screen
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
 import androidx.car.app.model.Action
+import androidx.car.app.model.ActionStrip
 import androidx.car.app.model.CarIcon
-import androidx.car.app.model.Header
 import androidx.car.app.model.MessageTemplate
 import androidx.car.app.model.Pane
 import androidx.car.app.model.PaneTemplate
@@ -13,7 +13,6 @@ import androidx.car.app.model.Template
 import androidx.core.graphics.drawable.IconCompat
 import com.example.places.carappservice.R
 import com.example.places.data.PlacesCache
-import com.example.places.data.PlacesRepository
 import com.example.places.data.model.toIntent
 
 class DetailScreen(carContext: CarContext, private val placeId: Int) : Screen(carContext) {
@@ -22,11 +21,8 @@ class DetailScreen(carContext: CarContext, private val placeId: Int) : Screen(ca
     override fun onGetTemplate(): Template {
         val place = PlacesCache.places.find { it.id == placeId }
             ?: return MessageTemplate.Builder("Place not found")
-                .setHeader(
-                    Header.Builder()
-                        .setStartHeaderAction(Action.BACK)
-                        .build()
-                )
+                .setHeaderAction(Action.BACK)
+                .setTitle("Thông báo")
                 .build()
 
         val navigateAction = Action.Builder()
@@ -77,12 +73,15 @@ class DetailScreen(carContext: CarContext, private val placeId: Int) : Screen(ca
                         .addText(place.description)
                         .build()
                 ).build()
-        ).setHeader(
-            Header.Builder()
-                .setStartHeaderAction(Action.BACK)
-                .setTitle(place.name)
-                .addEndHeaderAction(bookmarkAction)
-                .build()
-        ).build()
+        )
+            // Đã thay thế phần setHeader() gây lỗi bằng 3 hàm chuẩn dưới đây:
+            .setTitle(place.name)
+            .setHeaderAction(Action.BACK)
+            .setActionStrip(
+                ActionStrip.Builder()
+                    .addAction(bookmarkAction)
+                    .build()
+            )
+            .build()
     }
 }

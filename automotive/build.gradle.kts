@@ -46,4 +46,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(project(":common:car-app-service"))
     implementation(libs.androidx.car.app.automotive)
+    implementation("androidx.car.app:app-automotive:1.4.0")
 }

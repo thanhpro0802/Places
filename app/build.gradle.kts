@@ -59,7 +59,6 @@ dependencies {
     implementation(project(":common:data"))
     implementation(project(":common:car-app-service"))
     implementation(libs.androidx.car.app)
-    implementation(libs.androidx.car.app)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

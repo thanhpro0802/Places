@@ -28,6 +28,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.places.carappservice.R
 import com.example.places.data.PlacesRepository
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.launch
 
 // Enum quản lý tất cả loại bộ lọc địa điểm
@@ -71,13 +73,21 @@ class MainScreen(carContext: CarContext) : Screen(carContext) {
 
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+        CarToast.makeText(carContext, "Đang quét GPS...", CarToast.LENGTH_SHORT).show()
+
+        // Ép thiết bị lấy vị trí chính xác hiện tại
+        fusedLocationClient.getCurrentLocation(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            CancellationTokenSource().token
+        ).addOnSuccessListener { location ->
             if (location != null) {
                 currentLocation = location
                 fetchPlacesFromOSM(location.latitude, location.longitude)
             } else {
-                CarToast.makeText(carContext, "Đang xác định vị trí...", CarToast.LENGTH_SHORT).show()
+                CarToast.makeText(carContext, "Chưa lấy được vị trí. Hãy gửi tọa độ (Set Location) trên máy ảo!", CarToast.LENGTH_LONG).show()
             }
+        }.addOnFailureListener {
+            CarToast.makeText(carContext, "Lỗi quét vị trí: ${it.message}", CarToast.LENGTH_SHORT).show()
         }
     }
 
@@ -102,13 +112,14 @@ class MainScreen(carContext: CarContext) : Screen(carContext) {
             .addAction(buildFilterAction("🍜", "Quán ăn", FilterType.RESTAURANT))
             .addAction(buildFilterAction("⛽", "Xăng", FilterType.FUEL))
             .addAction(buildFilterAction("☕", "Cafe", FilterType.CAFE))
-            .addAction(buildFilterAction("🏥", "Bệnh viện", FilterType.HOSPITAL))
+            //.addAction(buildFilterAction("🏥", "Bệnh viện", FilterType.HOSPITAL))
             .addAction(
                 // Nút tìm kiếm — push SearchScreen
                 Action.Builder()
                     .setIcon(
                         CarIcon.Builder(
-                            IconCompat.createWithResource(carContext, R.drawable.baseline_navigation_24)
+                            // ĐÃ CẬP NHẬT THÀNH ICON SEARCH TẠI ĐÂY
+                            IconCompat.createWithResource(carContext, R.drawable.baseline_search_24)
                         ).build()
                     )
                     .setOnClickListener {
@@ -138,7 +149,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext) {
         }
 
         val hasPermission = carContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
-            PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED
         val headerTitle = if (hasPermission) "Địa điểm quanh xe" else "Đang chờ cấp quyền..."
         val currentApiLevel = carContext.carAppApiLevel
 
